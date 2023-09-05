@@ -1,9 +1,9 @@
-const project = new Project('ShaderTest');
+const project = new Project('ShaderTest', {kong: true});
 
 await project.addProject('../Kinc');
 
 project.addFile('Sources/**');
-project.addFile('Shaders/**');
+project.addKongDir('Shaders');
 project.setDebugDir('Deployment');
 
 project.flatten();

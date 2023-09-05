@@ -15,7 +15,7 @@ fun pos(input: vertex_in): vertex_out {
 	var position: float4;
 	position.xyz = input.pos;
 	position.w = 1.0;
-	output.pos = mvp * position;
+	output.pos = constants.mvp * position;
 }
 
 fun pixel(input: vertex_out): float4 {

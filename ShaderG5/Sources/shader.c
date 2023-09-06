@@ -8,14 +8,13 @@
 #include <kinc/system.h>
 #include <kinc/window.h>
 
+#include <kong.h>
+
 #include <assert.h>
 
 #define BUFFER_COUNT 2
 static int currentBuffer = -1;
 static kinc_g5_render_target_t framebuffers[BUFFER_COUNT];
-static kinc_g5_shader_t vertexShader;
-static kinc_g5_shader_t fragmentShader;
-static kinc_g5_pipeline_t pipeline;
 static kinc_g5_vertex_buffer_t vertices;
 static kinc_g5_index_buffer_t indices;
 static kinc_g5_command_list_t commandList;
@@ -50,7 +49,7 @@ static void update(void *data) {
 	kinc_g5_render_target_t *p_framebuffer = &framebuffers[currentBuffer];
 	kinc_g5_command_list_set_render_targets(&commandList, &p_framebuffer, 1);
 	kinc_g5_command_list_clear(&commandList, &framebuffers[currentBuffer], KINC_G5_CLEAR_COLOR, 0, 0.0f, 0);
-	kinc_g5_command_list_set_pipeline(&commandList, &pipeline);
+	kinc_g5_command_list_set_pipeline(&commandList, &pipeline.impl._pipeline);
 
 	int offset = 0;
 	kinc_g5_vertex_buffer_t *p_vertices = &vertices;
@@ -67,16 +66,6 @@ static void update(void *data) {
 	kinc_g5_swap_buffers();
 }
 
-static void load_shader(const char *filename, kinc_g5_shader_t *shader, kinc_g5_shader_type_t shader_type) {
-	kinc_file_reader_t file;
-	kinc_file_reader_open(&file, filename, KINC_FILE_TYPE_ASSET);
-	size_t data_size = kinc_file_reader_size(&file);
-	uint8_t *data = allocate(data_size);
-	kinc_file_reader_read(&file, data, data_size);
-	kinc_file_reader_close(&file);
-	kinc_g5_shader_init(shader, data, data_size, shader_type);
-}
-
 int kickstart(int argc, char **argv) {
 	kinc_init("Shader", 1024, 768, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
@@ -84,40 +73,26 @@ int kickstart(int argc, char **argv) {
 	heap = (uint8_t *)malloc(HEAP_SIZE);
 	assert(heap != NULL);
 
-	load_shader("shader.vert", &vertexShader, KINC_G5_SHADER_TYPE_VERTEX);
-	load_shader("shader.frag", &fragmentShader, KINC_G5_SHADER_TYPE_FRAGMENT);
-
-	kinc_g5_vertex_structure_t structure;
-	kinc_g5_vertex_structure_init(&structure);
-	kinc_g5_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_F32_3X);
-	kinc_g5_pipeline_init(&pipeline);
-	pipeline.vertexShader = &vertexShader;
-	pipeline.fragmentShader = &fragmentShader;
-	pipeline.inputLayout[0] = &structure;
-	pipeline.inputLayout[1] = NULL;
-	kinc_g5_pipeline_compile(&pipeline);
-
 	kinc_g5_command_list_init(&commandList);
 	for (int i = 0; i < BUFFER_COUNT; ++i) {
 		kinc_g5_render_target_init_framebuffer(&framebuffers[i], kinc_window_width(0), kinc_window_height(0), KINC_G5_RENDER_TARGET_FORMAT_32BIT, 16, 0);
 	}
 
-	kinc_g5_vertex_buffer_init(&vertices, 3, &structure, true, 0);
+	kinc_g5_vertex_buffer_init(&vertices, 3, &vertex_in_structure, true, 0);
 	{
-		float *v = kinc_g5_vertex_buffer_lock_all(&vertices);
-		int i = 0;
+		vertex_in *v = (vertex_in *)kinc_g5_vertex_buffer_lock_all(&vertices);
 
-		v[i++] = -1;
-		v[i++] = -1;
-		v[i++] = 0.5;
+		v[0].pos.x = -1;
+		v[0].pos.y = -1;
+		v[0].pos.z = 0.5;
 
-		v[i++] = 1;
-		v[i++] = -1;
-		v[i++] = 0.5;
+		v[1].pos.x = 1;
+		v[1].pos.y = -1;
+		v[1].pos.z = 0.5;
 
-		v[i++] = -1;
-		v[i++] = 1;
-		v[i++] = 0.5;
+		v[2].pos.x = -1;
+		v[2].pos.y = 1;
+		v[2].pos.z = 0.5;
 
 		kinc_g5_vertex_buffer_unlock_all(&vertices);
 	}

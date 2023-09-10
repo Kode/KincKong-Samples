@@ -16,6 +16,7 @@ fun pos(input: vertex_in): vertex_out {
 	position.xyz = input.pos;
 	position.w = 1.0;
 	output.pos = constants.mvp * position;
+	return output;
 }
 
 fun pixel(input: vertex_out): float4 {

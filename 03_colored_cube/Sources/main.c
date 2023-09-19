@@ -1,3 +1,4 @@
+#include <kinc/graphics4/constantbuffer.h>
 #include <kinc/graphics4/graphics.h>
 #include <kinc/graphics4/indexbuffer.h>
 #include <kinc/graphics4/pipeline.h>
@@ -8,17 +9,16 @@
 #include <kinc/system.h>
 #include <kinc/window.h>
 
+#include <kong.h>
+
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-static kinc_g4_shader_t vertex_shader;
-static kinc_g4_shader_t fragment_shader;
-static kinc_g4_pipeline_t pipeline;
 static kinc_g4_vertex_buffer_t vertices;
 static kinc_g4_index_buffer_t indices;
-static kinc_g4_constant_location_t mvp_loc;
+static constants_type_buffer constants;
 
 #define HEAP_SIZE 1024 * 1024
 static uint8_t *heap = NULL;
@@ -197,26 +197,20 @@ static void update(void *data) {
 	mvp = kinc_matrix4x4_multiply(&mvp, &view);
 	mvp = kinc_matrix4x4_multiply(&mvp, &model);
 
+	constants_type *constants_data = constants_type_buffer_lock(&constants);
+	constants_data->mvp = mvp;
+	constants_type_buffer_unlock(&constants);
+
 	kinc_g4_begin(0);
 	kinc_g4_clear(KINC_G4_CLEAR_COLOR | KINC_G4_CLEAR_DEPTH, 0xff000044, 1.0f, 0);
 	kinc_g4_set_pipeline(&pipeline);
-	kinc_g4_set_matrix4(mvp_loc, &mvp);
+	constants_type_buffer_set(&constants);
 	kinc_g4_set_vertex_buffer(&vertices);
 	kinc_g4_set_index_buffer(&indices);
 	kinc_g4_draw_indexed_vertices();
 
 	kinc_g4_end(0);
 	kinc_g4_swap_buffers();
-}
-
-static void load_shader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_shader_type_t shader_type) {
-	kinc_file_reader_t file;
-	kinc_file_reader_open(&file, filename, KINC_FILE_TYPE_ASSET);
-	size_t data_size = kinc_file_reader_size(&file);
-	uint8_t *data = allocate(data_size);
-	kinc_file_reader_read(&file, data, data_size);
-	kinc_file_reader_close(&file);
-	kinc_g4_shader_init(shader, data, data_size, shader_type);
 }
 
 int kickstart(int argc, char **argv) {
@@ -226,35 +220,20 @@ int kickstart(int argc, char **argv) {
 	heap = (uint8_t *)malloc(HEAP_SIZE);
 	assert(heap != NULL);
 
-	load_shader("shader.vert", &vertex_shader, KINC_G4_SHADER_TYPE_VERTEX);
-	load_shader("shader.frag", &fragment_shader, KINC_G4_SHADER_TYPE_FRAGMENT);
-
-	kinc_g4_vertex_structure_t structure;
-	kinc_g4_vertex_structure_init(&structure);
-	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_F32_3X);
-	kinc_g4_vertex_structure_add(&structure, "col", KINC_G4_VERTEX_DATA_F32_3X);
-	kinc_g4_pipeline_init(&pipeline);
-	pipeline.vertex_shader = &vertex_shader;
-	pipeline.fragment_shader = &fragment_shader;
-	pipeline.input_layout[0] = &structure;
-	pipeline.input_layout[1] = NULL;
-	pipeline.depth_write = true;
-	pipeline.depth_mode = KINC_G4_COMPARE_LESS;
-	kinc_g4_pipeline_compile(&pipeline);
-
-	mvp_loc = kinc_g4_pipeline_get_constant_location(&pipeline, "mvp");
+	// pipeline.depth_write = true;
+	// pipeline.depth_mode = KINC_G4_COMPARE_LESS;
 
 	int vertex_count = sizeof(vertices_data) / 3 / 4;
-	kinc_g4_vertex_buffer_init(&vertices, vertex_count, &structure, KINC_G4_USAGE_STATIC, 0);
+	kinc_g4_vertex_buffer_init(&vertices, vertex_count, &vertex_in_structure, KINC_G4_USAGE_STATIC, 0);
 	{
-		float *v = kinc_g4_vertex_buffer_lock_all(&vertices);
+		vertex_in *v = (vertex_in *)kinc_g4_vertex_buffer_lock_all(&vertices);
 		for (int i = 0; i < vertex_count; ++i) {
-			v[i * 6] = vertices_data[i * 3];
-			v[i * 6 + 1] = vertices_data[i * 3 + 1];
-			v[i * 6 + 2] = vertices_data[i * 3 + 2];
-			v[i * 6 + 3] = colors_data[i * 3];
-			v[i * 6 + 4] = colors_data[i * 3 + 1];
-			v[i * 6 + 5] = colors_data[i * 3 + 2];
+			v[i].pos.x = vertices_data[i * 3];
+			v[i].pos.y = vertices_data[i * 3 + 1];
+			v[i].pos.z = vertices_data[i * 3 + 2];
+			v[i].col.x = colors_data[i * 3];
+			v[i].col.y = colors_data[i * 3 + 1];
+			v[i].col.z = colors_data[i * 3 + 2];
 		}
 		kinc_g4_vertex_buffer_unlock_all(&vertices);
 	}
@@ -267,6 +246,8 @@ int kickstart(int argc, char **argv) {
 		}
 		kinc_g4_index_buffer_unlock_all(&indices);
 	}
+
+	constants_type_buffer_init(&constants);
 
 	kinc_start();
 

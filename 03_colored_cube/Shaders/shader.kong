@@ -1,0 +1,40 @@
+struct vertex_in {
+	pos: float3;
+	col: float3;
+}
+
+struct vertex_out {
+	pos: float4;
+	col: float3;
+}
+
+const constants: {
+	mvp: float4x4;
+};
+
+fun pos(input: vertex_in): vertex_out {
+	var output: vertex_out;
+	
+	var position: float4;
+	position.xyz = input.pos;
+	position.w = 1.0;
+	
+	output.pos = constants.mvp * position;
+
+	output.col = input.col;
+	
+	return output;
+}
+
+fun pix(input: vertex_out): float4 {
+	var color: float4;
+	color.xyz = input.col;
+	color.w = 1.0;
+	return color;
+}
+
+#[pipe]
+struct pipeline {
+	vertex = pos;
+	fragment = pix;
+}

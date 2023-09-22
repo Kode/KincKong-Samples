@@ -8,12 +8,11 @@
 #include <kinc/io/filereader.h>
 #include <kinc/system.h>
 
+#include <kong.h>
+
 #include <assert.h>
 #include <stdlib.h>
 
-static kinc_g4_shader_t vertex_shader;
-static kinc_g4_shader_t fragment_shader;
-static kinc_g4_pipeline_t pipeline;
 static kinc_g4_vertex_buffer_t vertices;
 static kinc_g4_index_buffer_t indices;
 static kinc_g4_render_target_t target;
@@ -52,16 +51,6 @@ static void update(void *data) {
 	kinc_g1_end();
 }
 
-static void load_shader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_shader_type_t shader_type) {
-	kinc_file_reader_t file;
-	kinc_file_reader_open(&file, filename, KINC_FILE_TYPE_ASSET);
-	size_t data_size = kinc_file_reader_size(&file);
-	uint8_t *data = allocate(data_size);
-	kinc_file_reader_read(&file, data, data_size);
-	kinc_file_reader_close(&file);
-	kinc_g4_shader_init(shader, data, data_size, shader_type);
-}
-
 int kickstart(int argc, char **argv) {
 	kinc_init("Example", 1024, 768, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
@@ -69,38 +58,24 @@ int kickstart(int argc, char **argv) {
 	heap = (uint8_t *)malloc(HEAP_SIZE);
 	assert(heap != NULL);
 
-	load_shader("shader.vert", &vertex_shader, KINC_G4_SHADER_TYPE_VERTEX);
-	load_shader("shader.frag", &fragment_shader, KINC_G4_SHADER_TYPE_FRAGMENT);
-
-	kinc_g4_vertex_structure_t structure;
-	kinc_g4_vertex_structure_init(&structure);
-	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_F32_3X);
-	kinc_g4_pipeline_init(&pipeline);
-	pipeline.vertex_shader = &vertex_shader;
-	pipeline.fragment_shader = &fragment_shader;
-	pipeline.input_layout[0] = &structure;
-	pipeline.input_layout[1] = NULL;
-	kinc_g4_pipeline_compile(&pipeline);
-
 	kinc_g4_render_target_init(&target, 1024, 768, KINC_G4_RENDER_TARGET_FORMAT_128BIT_FLOAT, 0, 0);
 	kinc_g1_init(1024, 768);
 
-	kinc_g4_vertex_buffer_init(&vertices, 3, &structure, KINC_G4_USAGE_STATIC, 0);
+	kinc_g4_vertex_buffer_init(&vertices, 3, &vertex_in_structure, KINC_G4_USAGE_STATIC, 0);
 	{
-		float *v = kinc_g4_vertex_buffer_lock_all(&vertices);
-		int i = 0;
+		vertex_in *v = (vertex_in *)kinc_g4_vertex_buffer_lock_all(&vertices);
 
-		v[i++] = -1.0;
-		v[i++] = -1.0;
-		v[i++] = 0.0;
+		v[0].pos.x = -1.0;
+		v[0].pos.y = -1.0;
+		v[0].pos.z = 0.0;
 
-		v[i++] = 1.0;
-		v[i++] = -1.0;
-		v[i++] = 0.0;
+		v[1].pos.x = 1.0;
+		v[1].pos.y = -1.0;
+		v[1].pos.z = 0.0;
 
-		v[i++] = 0.0;
-		v[i++] = 1.0;
-		v[i++] = 0.0;
+		v[2].pos.x = 0.0;
+		v[2].pos.y = 1.0;
+		v[2].pos.z = 0.0;
 
 		kinc_g4_vertex_buffer_unlock_all(&vertices);
 	}

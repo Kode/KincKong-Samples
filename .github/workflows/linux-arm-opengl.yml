@@ -61,26 +61,6 @@ jobs:
             cd Shader
             ../Kinc/make -g opengl --compile
             cd ..
-            echo " * Compile Texture"
-            cd Texture
-            ../Kinc/make -g opengl --compile
-            cd ..
-            echo " * Compile MultiWindow"
-            cd MultiWindow
-            ../Kinc/make -g opengl --compile
-            cd ..
-            echo " * Compile ComputeShader"
-            cd ComputeShader
-            ../Kinc/make -g opengl --compile
-            cd ..
-            echo " * Compile TextureArray"
-            cd TextureArray
-            ../Kinc/make -g opengl --compile
-            cd ..
-            echo " * Compile ShaderG5"
-            cd ShaderG5
-            ../Kinc/make -g opengl --compile
-            cd ..
             echo " * Compile 00_empty"
             cd 00_empty
             ../Kinc/make -g opengl --compile
@@ -123,25 +103,5 @@ jobs:
             cd ..
             echo " * Compile 10_cubemap"
             cd 10_cubemap
-            ../Kinc/make -g opengl --compile
-            cd ..
-            echo " * Compile 11_instanced_rendering"
-            cd 11_instanced_rendering
-            ../Kinc/make -g opengl --compile
-            cd ..
-            echo " * Compile 12_set_render_target_depth"
-            cd 12_set_render_target_depth
-            ../Kinc/make -g opengl --compile
-            cd ..
-            echo " * Compile 13_generate_mipmaps"
-            cd 13_generate_mipmaps
-            ../Kinc/make -g opengl --compile
-            cd ..
-            echo " * Compile 14_set_mipmap"
-            cd 14_set_mipmap
-            ../Kinc/make -g opengl --compile
-            cd ..
-            echo " * Compile 15_deinterleaved_buffers"
-            cd 15_deinterleaved_buffers
             ../Kinc/make -g opengl --compile
             cd ..

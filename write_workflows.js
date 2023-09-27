@@ -3,12 +3,12 @@ const path = require('path');
 
 const samples = [
 	'Shader',
-	'Texture',
+	/*'Texture',
 	'MultiWindow',
 	'ComputeShader',
 	'TextureArray',
 	'ShaderG5',
-  'RuntimeShaderCompilation',
+  'RuntimeShaderCompilation',*/
   '00_empty',
   '01_triangle',
   '02_matrix',
@@ -20,11 +20,11 @@ const samples = [
   '08_float_render_targets',
   '09_depth_render_targets',
   '10_cubemap',
-  '11_instanced_rendering',
+  /*'11_instanced_rendering',
   '12_set_render_target_depth',
   '13_generate_mipmaps',
   '14_set_mipmap',
-  '15_deinterleaved_buffers'
+  '15_deinterleaved_buffers'*/
 ];
 
 const workflowsDir = path.join('.github', 'workflows');

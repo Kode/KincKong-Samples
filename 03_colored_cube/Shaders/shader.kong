@@ -37,4 +37,6 @@ fun pix(input: vertex_out): float4 {
 struct pipeline {
 	vertex = pos;
 	fragment = pix;
+	depth_write = true;
+	depth_mode = COMPARE_LESS;
 }

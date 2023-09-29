@@ -220,9 +220,6 @@ int kickstart(int argc, char **argv) {
 	heap = (uint8_t *)malloc(HEAP_SIZE);
 	assert(heap != NULL);
 
-	// pipeline.depth_write = true;
-	// pipeline.depth_mode = KINC_G4_COMPARE_LESS;
-
 	int vertex_count = sizeof(vertices_data) / 3 / 4;
 	kinc_g4_vertex_buffer_init(&vertices, vertex_count, &vertex_in_structure, KINC_G4_USAGE_STATIC, 0);
 	{

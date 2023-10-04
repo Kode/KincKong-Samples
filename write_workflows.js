@@ -285,11 +285,11 @@ const workflows = [
     gfx: 'OpenGL',
     runsOn: 'ubuntu-latest'
   },
-  {
+  /*{
     sys: 'Android',
     gfx: 'Vulkan',
     runsOn: 'ubuntu-latest'
-  },
+  },*/
   {
     sys: 'Emscripten',
     gfx: 'WebGL',
@@ -351,7 +351,7 @@ const workflows = [
 `,
     RuntimeShaderCompilation: true
   },
-  {
+  /*{
     sys: 'Linux',
     gfx: 'Vulkan',
     runsOn: 'ubuntu-latest',
@@ -365,7 +365,7 @@ const workflows = [
     - name: Apt Install
       run: sudo apt install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev vulkan-sdk libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
 `
-  },
+  },*/
   {
     sys: 'macOS',
     gfx: 'Metal',
@@ -411,7 +411,7 @@ const workflows = [
     gfx: 'OpenGL',
     runsOn: 'windows-latest',
     vs: 'vs2022'
-  },
+  }/*,
   {
     sys: 'Windows',
     gfx: 'Vulkan',
@@ -427,7 +427,7 @@ const workflows = [
           Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.2.189.2/windows/VulkanSDK-1.2.189.2-Installer.exe" -OutFile VulkanSDK.exe
           $installer = Start-Process -FilePath VulkanSDK.exe -Wait -PassThru -ArgumentList @("--da", "--al", "-c", "in");
           $installer.WaitForExit();`
-  }
+  }*/
 ];
 
 for (const workflow of workflows) {

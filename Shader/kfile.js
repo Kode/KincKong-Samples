@@ -1,6 +1,6 @@
-const project = new Project('ShaderTest', {kong: true});
+const project = new Project('ShaderTest');
 
-await project.addProject('../Kinc');
+await project.addProject('../Kinc', {kong: true});
 
 project.addFile('Sources/**');
 project.addKongDir('Shaders');

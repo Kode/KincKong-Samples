@@ -162,10 +162,10 @@ jobs:
           # Produce a binary artifact and place it in the mounted volume
           run: |
             echo " * Make Git happy"
-            git config --global --add safe.directory /home/runner/work/Kinc-Samples/Kinc-Samples
-            git config --global --add safe.directory /home/runner/work/Kinc-Samples/Kinc-Samples/Kinc
-            git config --global --add safe.directory /home/runner/work/Kinc-Samples/Kinc-Samples/Kinc/Tools/linux_arm
-            git config --global --add safe.directory /home/runner/work/Kinc-Samples/Kinc-Samples/Kinc/Tools/linux_arm64
+            git config --global --add safe.directory /home/runner/work/KincKong-Samples/KincKong-Samples
+            git config --global --add safe.directory /home/runner/work/KincKong-Samples/KincKong-Samples/Kinc
+            git config --global --add safe.directory /home/runner/work/KincKong-Samples/KincKong-Samples/Kinc/Tools/linux_arm
+            git config --global --add safe.directory /home/runner/work/KincKong-Samples/KincKong-Samples/Kinc/Tools/linux_arm64
             echo " * Get Submodules"
             ./get_dlc
 `;
